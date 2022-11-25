@@ -36,7 +36,7 @@ class U2049Bridge(Vxi11.InstrumentDevice, Vxi11.Instrument):
         return
 
     def device_write(self, opaque_data, flags, io_timeout):
-        error = Vxi11.ERR_NO_ERROR
+        error = Vxi11.Error.NO_ERROR
 
         #opaque_data is a bytes array, so decode it correctly
         bytesSeq=opaque_data.decode("ascii")
@@ -47,13 +47,15 @@ class U2049Bridge(Vxi11.InstrumentDevice, Vxi11.Instrument):
         if 'ERR?' in cmd: 
             #self.terminalInstrument.write(cmd)
             #self.result = self.terminalInstrument.read()
-            self.result = '+0,No error'
+            self.result = '+0, No error'
         elif '?' in cmd:
             self.terminalInstrument.write(cmd)
             self.result = self.terminalInstrument.read()
+        elif 'trig1:sour' in cmd:
+            self.terminalInstrument.write('TRIG:SOUR IMM')
         else:
             self.terminalInstrument.write(cmd)
-        
+        # dict(incomeCmd, outputCmd)
         print('\n@@Return result:', repr(self.result), '\n')
 
 
@@ -78,7 +80,7 @@ class U2049Bridge(Vxi11.InstrumentDevice, Vxi11.Instrument):
         return error
     
     def device_read(self, request_size, term_char, flags, io_timeout):
-        error = Vxi11.ERR_NO_ERROR
+        error = Vxi11.Error.NO_ERROR
         reason = Vxi11.ReadRespReason.END
 
         #device-read returns opaque_data so encode it correctly
@@ -96,10 +98,10 @@ if __name__ == '__main__':
     logger.info('starting time_device')
     
     # create a server, attach a device, and start a thread to listen for requests
-    instr_server = Vxi11.InstrumentServer()
+    instr_server = Vxi11.InstrumentServer(U2049Bridge)
     #name = 'TIME'
-    name = 'inst1'
-    instr_server.add_device_handler(U2049Bridge, name)
+    #name = 'inst1'
+    #instr_server.add_device_handler(U2049Bridge, 'inst0')
     instr_server.listen()
 
     # sleep (or do foreground work) while the Instrument threads do their job
