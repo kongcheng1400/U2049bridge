@@ -51,7 +51,7 @@ class U2049Bridge(Vxi11.InstrumentDevice, Vxi11.Instrument):
         elif '?' in cmd:
             self.terminalInstrument.write(cmd)
             self.result = self.terminalInstrument.read()
-        elif 'trig1:sour' in cmd:
+        elif 'trig1:sour' in cmd.lower():
             self.terminalInstrument.write('TRIG:SOUR IMM')
         else:
             self.terminalInstrument.write(cmd)
